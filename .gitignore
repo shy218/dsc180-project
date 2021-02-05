@@ -4,5 +4,6 @@ data/*
 */.DS_Store
 
 */.ipynb_checkpoints
+.ftpconfig
 
 */__pycache__
