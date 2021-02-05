@@ -4,23 +4,30 @@ from tqdm import tqdm
 import pandas as pd
 
 sys.path.insert(1, './src/')
-from features import *
+from data_preprocessing import *
+from data_downloads import *
 
-def handle_price_change():
-    all_cleaned = []
-    file_lst = listdir('data/price_history/')
-    counter = 0
-    for comp in tqdm(file_lst):
-        if 'csv' in comp:
-            cleaned_price = process_single_company(pd.read_csv('data/price_history/' + comp))
-            cleaned_price['company'] = comp.replace('.csv', '')
-            all_cleaned.append(cleaned_price)
-            counter += 1
-        # if counter > 3:
-        #     break
-    all_cleaned_df = pd.concat(all_cleaned)
-    all_cleaned_df.to_csv('./data/processed/price_history_all_cleaned.csv', index = False)
-    return 0
+def data_prep():
+    # Check if raw files are ready
+    if 'processed' not in listdir('data'):
+        os.system('mkdir data/processed/')
+    if 'raw' not in listdir('data/'):
+        os.system('mkdir data/raw/')
+    if '8K-gz' not in listdir('data/raw') or 'EPS' not in listdir('data/raw') \
+        or 'price_history' not in listdir('data/raw'):
+        to_dir = './data/raw/'
+        data_download(to_dir)
+    print(' => All raw data ready!')
+
+    # Run part 1, 2
+    raw_8k_fp = 'data/raw/8K-gz/'
+    handler_clean_8k(raw_8k_fp)
+    raw_eps_fp = 'data/raw/EPS/'
+    handle_process_eps(raw_eps_fp)
+
+    # Run part 3, 4
+    handle_merge_eps8k_pricehist()
+
 
 def main():
     if len(sys.argv) == 1:
@@ -28,10 +35,8 @@ def main():
     else:
         target = sys.argv[1]
 
-    if target == 'features':
-        handle_price_change()
-
-
+    if target == 'data_prep':
+        data_prep()
 
 
 main()
