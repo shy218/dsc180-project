@@ -4,7 +4,7 @@ import nltk
 import numpy as np
 import pandas as pd
 
-def text_encode(data_file_file, phrase_file, n_unigrams, treshhold):
+def text_encode(data_file, phrase_file, n_unigrams, treshhold):
 
 	#Unigram Encoding
 
