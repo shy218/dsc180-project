@@ -8,6 +8,7 @@ import re
 import json
 import seaborn as sns
 
+
 # Part 1 - Clean 8K reports
 def clean_doc_text(doc_text):
     doc_text = re.sub('\n+', '\n', doc_text)
@@ -29,11 +30,16 @@ def handle_single_document(doc, all_failed_doc):
         event_type = re.findall('EVENTS:.+\\n', doc)[0]
     return time, event_type
 
-def handler_clean_8k(raw_8k_fp):
+def handler_clean_8k(data_dir):
     print('===================================================================')
     print(' => Cleaning 8K...')
+    print('===================================================================')
     all_data_dict = {}
     counter_8k = 0
+    raw_8k_fp = data_dir + 'raw/8K-gz/'
+    # raw_8k_fp = data_dir + ''
+    print('raw_8k_fp', raw_8k_fp)
+    print('data_dir', data_dir)
     for fp in tqdm(listdir(raw_8k_fp)):
         if fp == '.DS_Store':
             continue
@@ -83,10 +89,12 @@ def get_EPS(file):
                 temp.append(p.text)
             result.append(temp)
     return result
-def handler_process_eps(raw_eps_fp):
+def handler_process_eps(data_dir):
     print('===================================================================')
     print(' => Processing EPS...')
+    print('===================================================================')
     result = []
+    raw_eps_fp = data_dir + 'raw/EPS/'
     for file in listdir(raw_eps_fp):
         # print(file)
         if 'txt' not in file:
@@ -96,8 +104,8 @@ def handler_process_eps(raw_eps_fp):
         for t in temp:
             result.append([date] + t)
     df = pd.DataFrame(result, columns = ['Report Date', 'Code', 'Surprise(%)', 'Reported EPS', 'Consensus EPS'])
-    print(' => Saving the processed EPS infomation to local dir: data/processed/EPS.csv')
-    df.to_csv('./data/processed/EPS.csv', index = None)
+    print(' => Saving the processed EPS infomation to local dir: [data_dir]/processed/EPS.csv')
+    df.to_csv(data_dir + 'processed/EPS.csv', index = None)
 
 # Part 3 - Merge EPS and 8K text
 def clean_time(time_str):
@@ -106,12 +114,12 @@ def clean_time(time_str):
     time = time_str[8:]
     return date, time
 
-def merge_EPS_8K(from_local_file = False):
+def merge_EPS_8K(data_dir, from_local_file = False):
     if from_local_file:
-        with open('./data/processed/8k.json') as json_file:
+        with open(data_dir + 'processed/8k.json') as json_file:
             all_data_dict = json.load(json_file)
     else:
-        all_data_dict = handler_clean_8k('data/raw/8K-gz/') # output of step 1
+        all_data_dict = handler_clean_8k(data_dir) # output of step 1
 
     all_8k_lst = []
     doc_counter = 0
@@ -132,7 +140,7 @@ def merge_EPS_8K(from_local_file = False):
     all_8k_df = pd.DataFrame(all_8k_lst)
     all_8k_df['time_code'] = all_8k_df.date + all_8k_df.Code
 
-    eps_df = pd.read_csv('./data/processed/EPS.csv') # output of step 2
+    eps_df = pd.read_csv(data_dir + 'processed/EPS.csv') # output of step 2
     eps_df['time_code'] = eps_df['Report Date'].apply(lambda x: str(x)) + eps_df.Code
     # print(all_8k_df.head(1))
     # print(eps_df.head(1))
@@ -186,9 +194,9 @@ def calc_prediction_target(price_df, dates_pairs, sp500_dict):
         price_delta.append(stock_percent_change - sp500_change)
     return price_delta
 
-def prep_sp500(min_date):
-    # print(min_date)
-    sp500_df = pd.read_csv('./data/processed/sp500.csv')
+def prep_sp500(min_date, data_dir):
+    print(min_date)
+    sp500_df = pd.read_csv(data_dir + 'raw/sp500.csv')
     sp500_df.Date = sp500_df.Date.apply(lambda x: pd.to_datetime(x))
     sp500_df['date_idx'] = sp500_df.Date.apply(lambda x: (x - min_date).days)
     sp500_df = sp500_df.query('date_idx >= 0').reset_index(drop = True)
@@ -196,24 +204,24 @@ def prep_sp500(min_date):
     sp500_dict = dict(sp500_df.day_change)
     return sp500_dict
 
-def handle_merge_eps8k_pricehist():
+def handle_merge_eps8k_pricehist(data_dir, save_8k_json):
     print()
     print('===================================================================')
     print(' => Merging eps, 8k and price history...')
-    merged_df = merge_EPS_8K() # Call part 3 code
-    print(merged_df.shape)
+    print('===================================================================')
+    merged_df = merge_EPS_8K(data_dir, save_8k_json) # Call part 3 code
+    print(merged_df)
     print(' => Done merging 8k and EPS!')
     min_date = merged_df.date.min()
-    sp500_dict = prep_sp500(min_date)
+    sp500_dict = prep_sp500(min_date, data_dir)
 
-    min_date = merged_df.date.min()
     merged_df['date_idx'] = merged_df.date.apply(lambda x: (x - min_date).days)
     max_date_idx = merged_df['date_idx'].max()
 
     symbol_missing_price = []
     sub_dfs = []
-    print(merged_df.shape)
-    price_history_dir = './data/raw/price_history/'
+    # print(merged_df.shape)
+    price_history_dir = data_dir + 'raw/price_history/'
     for symbol in tqdm(merged_df.symbol.unique()):
         try:
             price_hist_df = pd.read_csv(price_history_dir + symbol + '.csv')
@@ -260,5 +268,5 @@ def handle_merge_eps8k_pricehist():
         tmp_merged_df['targe_price_change'] = calc_prediction_target(price_hist_df, pred_rarget_dates, sp500_dict)
         sub_dfs.append(tmp_merged_df)
     updated_merged_df = pd.concat(sub_dfs)
-    updated_merged_df.dropna().to_csv('./data/processed/merged_all_data.csv', index = False)
+    updated_merged_df.dropna().to_csv(data_dir + 'processed/merged_all_data.csv', index = False)
     return 0
