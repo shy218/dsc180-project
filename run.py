@@ -1,11 +1,16 @@
-from os import listdir
 import sys
-from tqdm import tqdm
+import json
 import pandas as pd
+from tqdm import tqdm
+from os import listdir
 
 sys.path.insert(1, './src/')
 from data_preprocessing import *
 from data_downloads import *
+from feature_encoding import *
+
+data_prep_config = json.loads(open('config/data_prep.json'))
+feature_encoding_config = json.loads(open('config/feature_encoding.json'))
 
 def data_prep():
     # Check if raw files are ready
@@ -15,21 +20,21 @@ def data_prep():
         os.system('mkdir data/raw/')
     if '8K-gz' not in listdir('data/raw') or 'EPS' not in listdir('data/raw') \
         or 'price_history' not in listdir('data/raw'):
-        to_dir = './data/raw/'
-        data_download(to_dir)
+        # to_dir = './data/raw/'
+        data_download(data_prep_config['to_dir'])
     print(' => All raw data ready!')
 
     # Run part 1, 2
-    raw_8k_fp = 'data/raw/8K-gz/'
-    handler_clean_8k(raw_8k_fp)
-    raw_eps_fp = 'data/raw/EPS/'
-    handler_process_eps(raw_eps_fp)
+    # raw_8k_fp = 'data/raw/8K-gz/'
+    handler_clean_8k(data_prep_config['raw_8k_fp'])
+    # raw_eps_fp = 'data/raw/EPS/'
+    handler_process_eps(data_prep_config['raw_eps_fp'])
     print(' => Done 8k and eps cleaning!')
     # Run part 3, 4
     handle_merge_eps8k_pricehist()
 
 def feature_encoding():
-    text_encode(data_file_file, phrase_file, n_unigrams, treshhold)
+    text_encode(**feature_encoding_config)
 
 def main():
     if len(sys.argv) == 1:

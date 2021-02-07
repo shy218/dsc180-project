@@ -4,10 +4,11 @@ import nltk
 import numpy as np
 import pandas as pd
 
-def text_encode(data_file, phrase_file, n_unigrams, treshhold):
+def text_encode(data_file, phrase_file, n_unigrams, treshhold, **kwargs):
 
 	#Unigram Encoding
-
+    
+    print('  => Tokenizing Data...')
 	word_count = {}
 	stopwords = nltk.corpus.stopwords.words('english')
 
@@ -25,7 +26,8 @@ def text_encode(data_file, phrase_file, n_unigrams, treshhold):
 	            word_count[token] += 1
 
 	#Takes n largest unigrams
-
+    
+    print('  => Encoding Unigrams...')
 	most_freq = heapq.nlargest(n_unigrams, word_count, key=word_count.get)
 
 	form_vectors = []
@@ -45,7 +47,8 @@ def text_encode(data_file, phrase_file, n_unigrams, treshhold):
 	data_file['unigram_vec'] = form_vectors
 
 	#Quality Phrase Encoding
-
+    
+    print('  => Encoding Quality Phrases...')
 	quality_phrases = pd.read_csv(phrase_file, sep = '\t', header = None)
 	
 	def clean(text):
@@ -69,7 +72,8 @@ def text_encode(data_file, phrase_file, n_unigrams, treshhold):
 	data_file['phrase_vec'] = phrase_vectors
 
 	#Exports to .pkl file for models to use
-
+    
+    print('  => Exporting to pkl...')
 	data_file.to_pickle('feature_encoded_data_file.pkl')
 
 	return
