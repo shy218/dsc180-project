@@ -7,3 +7,5 @@ data/*
 .ftpconfig
 
 */__pycache__
+
+*/typescript
