@@ -12,6 +12,7 @@ from feature_encoding import *
 data_prep_config = json.load(open('config/data_prep.json', 'r'))
 feature_encoding_config = json.load(open('config/feature_encoding.json', 'r'))
 test_config = json.load(open('config/test.json', 'r'))
+testing = False
 
 def data_prep(data_prep_config):
     data_dir = data_prep_config['data_dir']
@@ -42,7 +43,21 @@ def data_prep(data_prep_config):
     handle_merge_eps8k_pricehist(data_prep_config['data_dir'])
 
 def feature_encoding():
-    text_encode(**feature_encoding_config)
+
+    data_file = feature_encoding_config['data_file']
+    phrase_file = feature_encoding_config['phrase_file']
+    n_unigrams = feature_encoding_config['n_unigrams']
+    threshhold = feature_encoding_config['threshhold']
+
+    out_dir = 'data/processed/'
+
+    global testing
+    if testing:
+        out_dir = 'test/processed/'
+        data_file = data_file.replace('./data', './test')
+        phrase_file = phrase_file.replace('./data', './test')
+
+    text_encode(data_file, phrase_file, n_unigrams, threshhold, out_dir = out_dir)
 
 def main():
     if len(sys.argv) == 1:
@@ -50,11 +65,15 @@ def main():
     else:
         target = sys.argv[1]
 
+    # testing = False
     if target == 'data_prep':
         data_prep(data_prep_config)
     elif target == 'feature_encoding':
         feature_encoding()
     elif target == 'test':
+        global testing
+        testing = True
         data_prep(test_config)
+        feature_encoding()
 
 main()
