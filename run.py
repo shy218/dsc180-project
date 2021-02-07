@@ -35,12 +35,15 @@ def data_prep(data_prep_config):
     if 'processed' not in listdir(data_dir):
         os.system('mkdir ' + processed_dir)
 
-    handler_clean_8k(data_prep_config['data_dir'])
-    if not data_prep_config['testing']: # only process eps when it's not testing
+    # handler_clean_8k(data_prep_config['data_dir'])
+    global testing
+    if not testing: # only process eps when it's not testing
         handler_process_eps(data_prep_config['data_dir'])
-    print(' => Done 8k and eps cleaning!')
     # Run part 3, 4
     handle_merge_eps8k_pricehist(data_prep_config['data_dir'])
+    print()
+    print(' => Done Data Prep!')
+    print()
 
 def feature_encoding():
 

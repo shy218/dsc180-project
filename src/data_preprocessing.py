@@ -31,9 +31,9 @@ def handle_single_document(doc, all_failed_doc):
     return time, event_type
 
 def handler_clean_8k(data_dir):
-    print('===================================================================')
+    # print('===================================================================')
     print(' => Cleaning 8K...')
-    print('===================================================================')
+    # print('===================================================================')
     all_data_dict = {}
     counter_8k = 0
     raw_8k_fp = data_dir + 'raw/8K-gz/'
@@ -66,11 +66,10 @@ def handler_clean_8k(data_dir):
         # if counter_8k > 50:
         #     break
 
-    # print(' => Saving the cleaned 8K report to local dir: data/processed/8k.json')
-    # with open('./data/processed/8k.json', 'w') as outfile:
-    #     json.dump(all_data_dict, outfile)
-    # print(' => Example of one of the cleaned 8k report:', all_data_dict['AAPL'][0])
-    print()
+    print(' => Saving the cleaned 8K report to local dir: data_dir/processed/8k.json')
+    with open(data_dir + 'processed/8k.json', 'w') as outfile:
+        json.dump(all_data_dict, outfile)
+    print(' => Example of one of the cleaned 8k report:', all_data_dict['AAPL'][0])
     print()
     return all_data_dict
 
@@ -90,12 +89,12 @@ def get_EPS(file):
             result.append(temp)
     return result
 def handler_process_eps(data_dir):
-    print('===================================================================')
+    # print('===================================================================')
     print(' => Processing EPS...')
-    print('===================================================================')
+    # print('===================================================================')
     result = []
     raw_eps_fp = data_dir + 'raw/EPS/'
-    for file in listdir(raw_eps_fp):
+    for file in tqdm(listdir(raw_eps_fp)):
         # print(file)
         if 'txt' not in file:
             continue
@@ -103,8 +102,10 @@ def handler_process_eps(data_dir):
         date = int(file.split('.')[0])
         for t in temp:
             result.append([date] + t)
+
     df = pd.DataFrame(result, columns = ['Report Date', 'Code', 'Surprise(%)', 'Reported EPS', 'Consensus EPS'])
     print(' => Saving the processed EPS infomation to local dir: [data_dir]/processed/EPS.csv')
+    print()
     df.to_csv(data_dir + 'processed/EPS.csv', index = None)
 
 # Part 3 - Merge EPS and 8K text
@@ -208,7 +209,7 @@ def handle_merge_eps8k_pricehist(data_dir):
     print()
     print('===================================================================')
     print(' => Merging eps, 8k and price history...')
-    print('===================================================================')
+    # print('===================================================================')
     merged_df = merge_EPS_8K(data_dir) # Call part 3 code
     # print(merged_df)
     print(' => Done merging 8k and EPS!')
