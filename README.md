@@ -21,6 +21,6 @@ Our 3 main targets are data preparation, feature encoding and a test target. The
 * 'threshhold' takes quality phrases with a quality score above it to be encoded
 
 
-## test
+## Test
 
 * all the targets are the same as those in `Data Prep`, except `testing = true`
