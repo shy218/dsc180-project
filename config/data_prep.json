@@ -1,6 +1,8 @@
 {
-    "to_dir": "./data/raw/",
+    "data_dir": "./data/",
+    "raw_dir": "./data/raw/",
     "raw_8k_fp": "./data/raw/8K-gz/",
-    "raw_eps_fp": "./data/raw/EPS/"
+    "raw_eps_fp": "./data/raw/EPS/",
+    "processed_dir": "./data/processed/",
+    "testing": false
 }
-

@@ -38,8 +38,8 @@ def handler_clean_8k(data_dir):
     counter_8k = 0
     raw_8k_fp = data_dir + 'raw/8K-gz/'
     # raw_8k_fp = data_dir + ''
-    print('raw_8k_fp', raw_8k_fp)
-    print('data_dir', data_dir)
+    # print('raw_8k_fp', raw_8k_fp)
+    # print('data_dir', data_dir)
     for fp in tqdm(listdir(raw_8k_fp)):
         if fp == '.DS_Store':
             continue
@@ -195,7 +195,7 @@ def calc_prediction_target(price_df, dates_pairs, sp500_dict):
     return price_delta
 
 def prep_sp500(min_date, data_dir):
-    print(min_date)
+    # print(min_date)
     sp500_df = pd.read_csv(data_dir + 'raw/sp500.csv')
     sp500_df.Date = sp500_df.Date.apply(lambda x: pd.to_datetime(x))
     sp500_df['date_idx'] = sp500_df.Date.apply(lambda x: (x - min_date).days)
@@ -204,13 +204,13 @@ def prep_sp500(min_date, data_dir):
     sp500_dict = dict(sp500_df.day_change)
     return sp500_dict
 
-def handle_merge_eps8k_pricehist(data_dir, save_8k_json):
+def handle_merge_eps8k_pricehist(data_dir):
     print()
     print('===================================================================')
     print(' => Merging eps, 8k and price history...')
     print('===================================================================')
-    merged_df = merge_EPS_8K(data_dir, save_8k_json) # Call part 3 code
-    print(merged_df)
+    merged_df = merge_EPS_8K(data_dir) # Call part 3 code
+    # print(merged_df)
     print(' => Done merging 8k and EPS!')
     min_date = merged_df.date.min()
     sp500_dict = prep_sp500(min_date, data_dir)
