@@ -1,0 +1,7 @@
+{
+    "data_file": "./data/processed/merged_all_data.csv",
+    "phrase_file": "./data/AutoPhrase_multi-words.txt",
+    "n_unigrams": 1000,
+    "threshhold": 0.9
+}
+

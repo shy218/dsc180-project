@@ -1,0 +1,6 @@
+{
+    "to_dir": "./data/raw/",
+    "raw_8k_fp": "./data/raw/8K-gz/",
+    "raw_eps_fp": "./data/raw/EPS/"
+}
+
