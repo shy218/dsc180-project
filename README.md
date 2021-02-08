@@ -5,20 +5,20 @@ Our 3 main targets are data preparation, feature encoding and a test target. The
 
 ## Data Prep
 
-* 'data_dir' is the file path to download files: 8-K's, EPS, etc.
-* 'raw_dir' is the directory to the raw data
-* 'raw_8k_fp' is the file path with newly downloaded 8-K's (should be the same as to_dir)
-* 'raw_eps_fp' is the file path with newly downloaded EPS information (should be the same as to_dir)
-* 'processed_dir' is the directory to the processed data
-* 'testing' is the status of whether we are doing testing (by default is false)
+* `data_dir` is the file path to download files: 8-K's, EPS, etc.
+* `raw_dir` is the directory to the raw data
+* `raw_8k_fp` is the file path with newly downloaded 8-K's (should be the same as to_dir)
+* `raw_eps_fp` is the file path with newly downloaded EPS information (should be the same as to_dir)
+* `processed_dir` is the directory to the processed data
+* `testing` is the status of whether we are doing testing (by default is false)
 
 
 ## Feature Encoding
 
-* 'data_file' is the file path to outputed .csv file from the data prep target
-* 'phrase_file' is the file path to the quality phrases outputted by AutoPhrase
-* 'n_unigrams' sets the top n unigrams to be encoded
-* 'threshhold' takes quality phrases with a quality score above it to be encoded
+* `data_file` is the file path to outputed .csv file from the data prep target
+* `phrase_file` is the file path to the quality phrases outputted by AutoPhrase
+* `n_unigrams` sets the top n unigrams to be encoded
+* `threshhold` takes quality phrases with a quality score above it to be encoded
 
 
 ## Test
