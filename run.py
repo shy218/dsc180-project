@@ -51,6 +51,10 @@ def feature_encoding():
     phrase_file = feature_encoding_config['phrase_file']
     n_unigrams = feature_encoding_config['n_unigrams']
     threshhold = feature_encoding_config['threshhold']
+    train_split = feature_encoding_config['train_split']
+    test_split = feature_encoding_config['test_split']
+
+        
 
     out_dir = 'data/processed/'
 
@@ -60,7 +64,7 @@ def feature_encoding():
         data_file = data_file.replace('./data', './test')
         phrase_file = phrase_file.replace('./data', './test')
 
-    text_encode(data_file, phrase_file, n_unigrams, threshhold, out_dir = out_dir)
+    text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, out_dir = out_dir)
 
 def main():
     if len(sys.argv) == 1:
