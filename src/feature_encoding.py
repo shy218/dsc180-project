@@ -3,6 +3,7 @@ import heapq
 import nltk
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, **kwargs):
 
