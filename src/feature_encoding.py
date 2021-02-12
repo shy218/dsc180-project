@@ -6,14 +6,29 @@ import pandas as pd
 
 def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
 
+    merged_data = pd.read_csv(data_file)
+
+    def event_clean(text):
+        result = re.sub('\n', '', text)
+        result = re.split('\t', result)
+        if len(result) > 0:
+            return str.lower(result[1]).split(",")
+        else:
+            return 'Missing'
+
+    cleaned_event = merged_data['event_type'].apply(event_clean)
+    merged_data.insert(3, 'cleaned_event', cleaned_event)
+
+    X_train, X_test = train_test_split(merged_data, test_size = 0.51, random_state = 42)
+    X_val, X_test = train_test_split(X_test, test_size = 0.51, random_state = 42)
+    
     #Unigram Encoding
+    
     print()
     print(' => Tokenizing Data...')
     word_count = {}
     stopwords = nltk.corpus.stopwords.words('english')
-    # print(data_file)
-    data_file = pd.read_csv(data_file)
-    for form in data_file['full_text']:
+    for form in X_train['full_text']:
         cleaned_form = re.sub(r'\W',' ', form)
         cleaned_form = re.sub(r'\s+',' ', cleaned_form)
         cleaned_form = cleaned_form.lower()
@@ -32,7 +47,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
     most_freq = heapq.nlargest(n_unigrams, word_count, key=word_count.get)
 
     form_vectors = []
-    for form in data_file['full_text']:
+    for form in merged_data['full_text']:
         cleaned_form = re.sub(r'\W',' ', form)
         cleaned_form = re.sub(r'\s+',' ', cleaned_form)
         cleaned_form = cleaned_form.lower()
@@ -45,7 +60,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
                 temp.append(0)
         form_vectors.append(temp)
 
-    data_file['unigram_vec'] = form_vectors
+    merged_data['unigram_vec'] = form_vectors
 
     #Quality Phrase Encoding
 
@@ -60,7 +75,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
     top_phrases = quality_phrases['cleaned'].loc[quality_phrases[0] > threshhold].copy()
 
     phrase_vectors = []
-    for form in data_file['full_text']:
+    for form in merged_data['full_text']:
         cleaned_form = cleaned_form.lower()
         temp = []
         for phrase in top_phrases:
@@ -70,11 +85,11 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
                 temp.append(0)
         phrase_vectors.append(temp)
 
-    data_file['phrase_vec'] = phrase_vectors
+    merged_data['phrase_vec'] = phrase_vectors
 
     #Exports to .pkl file for models to use
 
     print(' => Exporting to pkl...')
-    data_file.to_pickle(kwargs['out_dir'] + 'feature_encoded_data_file.pkl')
+    merged_data.to_pickle(kwargs['out_dir'] + 'feature_encoded_merged_data.pkl')
 
     return
