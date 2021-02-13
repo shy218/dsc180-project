@@ -8,28 +8,43 @@ from sklearn.model_selection import train_test_split
 def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, **kwargs):
 
     merged_data = pd.read_csv(data_file)
-    
-    #Cleaned Event Feature
 
+    #Cleaned Event Feature
+    # counter = 0
     def event_clean(text):
         result = re.sub('\n', '', text)
         result = re.sub('\t+', '\t', result)
         result = re.split('\t', result)
+
         if len(result) > 0:
-            return str.lower(result[1]).split(";")
+            # nonlocal counter
+            # counter += 1
+            # print(result)
+            result = [s.lower() for s in result[1:]] # exclude the first item
+            cleaned_result = []
+            for s in result:
+                if ';' in s:
+                    for sub in s.split(';'):
+                        cleaned_result.append(sub.strip())
+                else:
+                    cleaned_result.append(s.strip())
+            # print(cleaned_result)
+            # print()
+            # print()
+            return cleaned_result
         else:
-            return 'Missing'
+            return ['Missing']
 
     cleaned_event = merged_data['event_type'].apply(event_clean)
     merged_data.insert(3, 'cleaned_event', cleaned_event)
-    
+
     #Train, Val, Test Split for Encoding
 
     X_train, X_test = train_test_split(merged_data, test_size = 1 - train_split, random_state = 42)
     X_val, X_test = train_test_split(X_test, test_size = test_split / (1 - train_split), random_state = 42)
-    
+
     #Unigram Encoding
-    
+
     print(' => Tokenizing Data...')
     word_count = {}
     stopwords = nltk.corpus.stopwords.words('english')

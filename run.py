@@ -54,7 +54,7 @@ def feature_encoding():
     train_split = feature_encoding_config['train_split']
     test_split = feature_encoding_config['test_split']
 
-        
+
 
     out_dir = 'data/processed/'
 
