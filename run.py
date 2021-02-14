@@ -38,9 +38,10 @@ def data_prep(data_prep_config):
     # handler_clean_8k(data_prep_config['data_dir'])
     global testing
     if not testing: # only process eps when it's not testing
-        handler_process_eps(data_prep_config['data_dir'])
+        handler_process_eps(data_dir)
     # Run part 3, 4
-    handle_merge_eps8k_pricehist(data_prep_config['data_dir'])
+    updated_merged_df = handle_merge_eps8k_pricehist(data_dir)
+    updated_merged_df.to_csv(data_dir + 'processed/merged_all_data.csv', index = False)
     print()
     print(' => Done Data Prep!')
     print()
@@ -64,7 +65,9 @@ def feature_encoding():
         data_file = data_file.replace('./data', './test')
         phrase_file = phrase_file.replace('./data', './test')
 
-    text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, out_dir = out_dir)
+    merged_data = text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, out_dir = out_dir)
+    print(' => Exporting to pkl...')
+    merged_data.to_pickle(out_dir + 'feature_encoded_merged_data.pkl')
 
 def main():
     if len(sys.argv) == 1:
