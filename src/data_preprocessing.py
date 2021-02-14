@@ -177,12 +177,14 @@ def calc_price_changes(price_df, date_delta, most_recent_dates):
         price_delta.append(percent_change)
     return price_delta
 
-def calc_prediction_target(price_df, dates_pairs, sp500_dict):
+def calc_prediction_target_vix(price_df, dates_pairs, sp500_dict, vix_dict):
     price_delta = []
+    vix_values = []
     for pair in dates_pairs:
         curr_date, target_date = pair
         if curr_date == -1 or target_date == -1:
             price_delta.append(np.nan)
+            vix_values.append(np.nan)
             continue
 
         # Find stock price change info
@@ -193,7 +195,11 @@ def calc_prediction_target(price_df, dates_pairs, sp500_dict):
         # Fine sp500 price change info
         sp500_change = sp500_dict[target_date]
         price_delta.append(stock_percent_change - sp500_change)
-    return price_delta
+
+        # Find the last vix close value
+        last_vix = vix_dict[curr_date]
+        vix_values.append(last_vix)
+    return price_delta, vix_values
 
 def prep_sp500(min_date, data_dir):
     # print(min_date)
@@ -205,6 +211,16 @@ def prep_sp500(min_date, data_dir):
     sp500_dict = dict(sp500_df.day_change)
     return sp500_dict
 
+def prep_vix(min_date, data_dir):
+    vix_df = pd.read_csv(data_dir + 'raw/price_history/vix.csv')
+    vix_df = vix_df[['Date', 'Adj Close']].rename(columns = {'Adj Close': 'Close'})
+    vix_df.Date = vix_df.Date.apply(lambda x: pd.to_datetime(x))
+    vix_df['date_idx'] = vix_df.Date.apply(lambda x: (x - min_date).days)
+    vix_df = vix_df.query('date_idx >= 0').reset_index(drop = True)
+    vix_df.index = vix_df.date_idx
+    vix_dict = dict(vix_df['Close'])
+    return vix_dict
+
 def handle_merge_eps8k_pricehist(data_dir):
     print()
     print('===================================================================')
@@ -215,6 +231,7 @@ def handle_merge_eps8k_pricehist(data_dir):
     print(' => Done merging 8k and EPS!')
     min_date = merged_df.date.min()
     sp500_dict = prep_sp500(min_date, data_dir)
+    vix_dict = prep_vix(min_date, data_dir)
 
     merged_df['date_idx'] = merged_df.date.apply(lambda x: (x - min_date).days)
     max_date_idx = merged_df['date_idx'].max()
@@ -266,8 +283,10 @@ def handle_merge_eps8k_pricehist(data_dir):
         for date_delta in [7, 30, 90, 365]:
             tmp_price_changes = calc_price_changes(price_hist_df, date_delta, most_recent_dates)
             tmp_merged_df['price_change_' + str(date_delta)] = tmp_price_changes
-        tmp_merged_df['targe_price_change'] = calc_prediction_target(price_hist_df, pred_rarget_dates, sp500_dict)
+        targe_price_change, prev_vix_values = \
+            calc_prediction_target_vix(price_hist_df, pred_rarget_dates, sp500_dict, vix_dict)
+        tmp_merged_df['targe_price_change'] = targe_price_change
+        tmp_merged_df['prev_vix_values'] = prev_vix_values
         sub_dfs.append(tmp_merged_df)
-    updated_merged_df = pd.concat(sub_dfs)
-    updated_merged_df.dropna().to_csv(data_dir + 'processed/merged_all_data.csv', index = False)
-    return 0
+    updated_merged_df = pd.concat(sub_dfs).dropna().reset_index(drop = True)
+    return updated_merged_df
