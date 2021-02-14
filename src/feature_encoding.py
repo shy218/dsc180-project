@@ -4,9 +4,13 @@ import nltk
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, **kwargs):
-
+    print()
+    print('===================================================================')
+    print(' => Text encoding...')
+    print()
     merged_data = pd.read_csv(data_file)
 
     #Cleaned Event Feature
@@ -45,10 +49,10 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
 
     #Unigram Encoding
 
-    print(' => Tokenizing Data...')
+    print('  => Tokenizing Data...')
     word_count = {}
     stopwords = nltk.corpus.stopwords.words('english')
-    for form in X_train['full_text']:
+    for form in tqdm(X_train['full_text']):
         cleaned_form = re.sub(r'\W',' ', form)
         cleaned_form = re.sub(r'\s+',' ', cleaned_form)
         cleaned_form = cleaned_form.lower()
@@ -62,12 +66,12 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
                 word_count[token] += 1
 
     #Takes n largest unigrams
-
-    print(' => Encoding Unigrams...')
+    print()
+    print('  => Encoding Unigrams...')
     most_freq = heapq.nlargest(n_unigrams, word_count, key=word_count.get)
 
     form_vectors = []
-    for form in merged_data['full_text']:
+    for form in tqdm(merged_data['full_text']):
         cleaned_form = re.sub(r'\W',' ', form)
         cleaned_form = re.sub(r'\s+',' ', cleaned_form)
         cleaned_form = cleaned_form.lower()
@@ -83,8 +87,8 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
     merged_data['unigram_vec'] = form_vectors
 
     #Quality Phrase Encoding
-
-    print(' => Encoding Quality Phrases...')
+    print()
+    print('  => Encoding Quality Phrases...')
     quality_phrases = pd.read_csv(phrase_file, sep = '\t', header = None)
 
     def clean(text):
@@ -95,7 +99,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
     top_phrases = quality_phrases['cleaned'].loc[quality_phrases[0] > threshhold].copy()
 
     phrase_vectors = []
-    for form in merged_data['full_text']:
+    for form in tqdm(merged_data['full_text']):
         cleaned_form = cleaned_form.lower()
         temp = []
         for phrase in top_phrases:
@@ -106,10 +110,9 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
         phrase_vectors.append(temp)
 
     merged_data['phrase_vec'] = phrase_vectors
-
+    print()
+    print(' => Done feature_encoding!')
     #Exports to .pkl file for models to use
-
-    print(' => Exporting to pkl...')
-    merged_data.to_pickle(kwargs['out_dir'] + 'feature_encoded_merged_data.pkl')
-
-    return
+    # print(' => Exporting to pkl...')
+    # merged_data.to_pickle(kwargs['out_dir'] + 'feature_encoded_merged_data.pkl')
+    return merged_data
