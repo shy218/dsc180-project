@@ -100,7 +100,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
 
     phrase_vectors = []
     for form in tqdm(merged_data['full_text']):
-        cleaned_form = cleaned_form.lower()
+        cleaned_form = form.lower()
         temp = []
         for phrase in top_phrases:
             if phrase in cleaned_form:
