@@ -25,9 +25,9 @@ def data_prep(data_prep_config):
         if '8K-gz' not in listdir(raw_dir):
             download_8k(raw_dir)
         if 'EPS' not in listdir(raw_dir):
-            download_price_history(raw_dir)
-        if 'price_history' not in listdir(raw_dir):
             download_eps(raw_dir)
+        if 'price_history' not in listdir(raw_dir):
+            download_price_history(raw_dir)
         print(' => All raw data ready!')
 
     # Process 8K, EPS and Price History as needed
