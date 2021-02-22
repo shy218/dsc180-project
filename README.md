@@ -17,7 +17,7 @@ Our 3 main targets are data preparation, feature encoding and a test target. The
 
 * `data_file` is the file path to outputed .csv file from the data prep target
 * `phrase_file` is the file path to the quality phrases outputted by AutoPhrase
-* `n_unigrams` sets the top n unigrams to be encoded
+* `n_unigrams` sets the top n unigrams to be encoded based on PMI
 * `threshhold` takes quality phrases with a quality score above it to be encoded
 * `train_split` is the desired size of the training data
 * `test_split` is the desired size of the test data (the validation_split is equal to 1 - train_split - test_split)
