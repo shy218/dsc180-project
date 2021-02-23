@@ -38,3 +38,8 @@ Stock market is one of the most popular markets that the investors like to put t
 ## Test
 
 * all the targets are the same as those in `Data Prep`, except `testing = true`
+
+## Updates
+
+* We are currently testing on different models, including Random Forest, Logistic Regression and SVM.
+* Our Random Forest Classifier receives 51% accuracy on training set and 47% on test set.
