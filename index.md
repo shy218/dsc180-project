@@ -1,4 +1,4 @@
-# DSC 180B Project
+# Using AutoPhrase for Text Mining in 8-K reports
 
 Our 3 main targets are data preparation, feature encoding and a test target. The data preparation target scrapes, cleans, and consolidates companies' 8-K documents. Furthermore, it curates features such as EPS as well as price movements for the given companies. The feature encoding target creates encoded text vectors for each 8-K: both unigrams and quality phrases outputed by the AutoPhrase method. Users can configure parameters for both these targets in the ./config files.
 
