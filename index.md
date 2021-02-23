@@ -2,6 +2,14 @@
 
 Our 3 main targets are data preparation, feature encoding and a test target. The data preparation target scrapes, cleans, and consolidates companies' 8-K documents. Furthermore, it curates features such as EPS as well as price movements for the given companies. The feature encoding target creates encoded text vectors for each 8-K: both unigrams and quality phrases outputed by the AutoPhrase method. Users can configure parameters for both these targets in the ./config files.
 
+## Datasets
+
+* [8-K Reports Database](https://nlp.stanford.edu/projects/lrec2014-stock/8K.tar.gz) 1.4G
+* [8-K Reports (RAR)](https://www.dropbox.com/s/pu08xl15b8y7jvu/8K.rar?dl=0) 701M
+* [8-K Reports With Info in JSON](https://www.dropbox.com/s/f7hxtruvkbu8ke9/8k.json?dl=0) 6.1G
+* [Merged Dataset with Price label](https://www.dropbox.com/s/872mfi57vygyhbw/merged_all_data.csv?dl=0) 618M
+* [Financial Quality Terms Web Mining from Investopedia](https://www.dropbox.com/s/ms1kh6kftrbpjz0/finance_quality.txt?dl=0)
+
 
 ## Data Prep
 
