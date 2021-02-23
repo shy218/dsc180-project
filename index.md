@@ -2,6 +2,10 @@
 
 Our 3 main targets are data preparation, feature encoding and a test target. The data preparation target scrapes, cleans, and consolidates companies' 8-K documents. Furthermore, it curates features such as EPS as well as price movements for the given companies. The feature encoding target creates encoded text vectors for each 8-K: both unigrams and quality phrases outputed by the AutoPhrase method. Users can configure parameters for both these targets in the ./config files.
 
+## Motivation
+
+Stock market is one of the most popular markets that the investors like to put their money in. There are millions of investors who participate in the stock market investment directly or indirectly, such as by mutual fund, defined-benefit plan. Certainly, there are many people who research on the stock market, and they all know the information takes an important role in the decision making. According to the Strong Form Market Efficiency Theorem, the stock price is only determined by the new information; otherwise, it will be a random walk. However, there are thousands of information in this market everyday, and the investors can only pay attention to few of them. Therefore, the investors, especially the individual investors without the help of professional financial analyst, can only get the parts of the whole information, so his investment decisions may be biased. In this project, we want to solve this real-world problem to apply the Phrase mining technique to forecast the stock price and help the investors to make the decision.
+
 ## Datasets
 
 * [8-K Reports Database](https://nlp.stanford.edu/projects/lrec2014-stock/8K.tar.gz) 1.4G
