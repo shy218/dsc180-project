@@ -94,24 +94,10 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
     
     all_word_count = {**up_dict, **stay_dict, **down_dict}
     all_word_count = {key:val for key, val in all_word_count.items() if val > 10}
-
-    word_count = {}
-    stopwords = nltk.corpus.stopwords.words('english')
-    for form in tqdm(X_train['full_text']):
-        cleaned_form = re.sub(r'\W',' ', form)
-        cleaned_form = re.sub(r'\s+',' ', cleaned_form)
-        cleaned_form = cleaned_form.lower()
-        tokens = nltk.word_tokenize(cleaned_form)
-        for token in tokens:
-            if token in stopwords:
-                continue
-            if token not in word_count.keys():
-                word_count[token] = 1
-            else:
-                word_count[token] += 1
                 
     #Compute PMI for each Class
     
+    print()
     print('  => Computing PMI...')
     print()
                 
@@ -132,6 +118,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
     
     highest_pmi = heapq.nlargest(n_unigrams, pmi_dict, key = pmi_dict.get)
 
+    print()
     print('  => Encoding Unigrams...')
     print()
 
