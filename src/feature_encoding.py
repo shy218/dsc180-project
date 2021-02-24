@@ -85,6 +85,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
                     word_count[token] += 1
         return word_count
     
+    print()
     print('  => Tokenizing Data for 3 Classes...')
     print()
     
@@ -141,6 +142,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
 
     #Quality Phrase Encoding
     
+    print()
     print('  => Encoding Quality Phrases...')
     print()
 
@@ -166,6 +168,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
 
     merged_data['phrase_vec'] = phrase_vectors
     
+    print()
     print(' => Done feature_encoding!')
     print()
     
