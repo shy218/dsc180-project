@@ -25,9 +25,9 @@ def data_prep(data_prep_config):
         if '8K-gz' not in listdir(raw_dir):
             download_8k(raw_dir)
         if 'EPS' not in listdir(raw_dir):
-            download_eps(raw_dir)
-        if 'price_history' not in listdir(raw_dir):
             download_price_history(raw_dir)
+        if 'price_history' not in listdir(raw_dir):
+            download_eps(raw_dir)
         print(' => All raw data ready!')
 
     # Process 8K, EPS and Price History as needed
@@ -54,8 +54,6 @@ def feature_encoding():
     threshhold = feature_encoding_config['threshhold']
     train_split = feature_encoding_config['train_split']
     test_split = feature_encoding_config['test_split']
-
-
 
     out_dir = 'data/processed/'
 

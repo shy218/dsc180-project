@@ -221,6 +221,16 @@ def prep_vix(min_date, data_dir):
     vix_dict = dict(vix_df['Close'])
     return vix_dict
 
+def handle_calc_dataset(df):
+    cutoffs = np.percentile(df.date_idx, 50), np.percentile(df.date_idx, 75)
+    def calc_dataset(x):
+        if x <= cutoffs[0]:
+            return 'train'
+        elif x <= cutoffs[1]:
+            return 'val'
+        return 'test'
+    return df.date_idx.apply(lambda x: calc_dataset(x))
+
 def handle_merge_eps8k_pricehist(data_dir):
     print()
     print('===================================================================')
@@ -289,4 +299,5 @@ def handle_merge_eps8k_pricehist(data_dir):
         tmp_merged_df['prev_vix_values'] = prev_vix_values
         sub_dfs.append(tmp_merged_df)
     updated_merged_df = pd.concat(sub_dfs).dropna().reset_index(drop = True)
+    updated_merged_df['dataset'] = handle_calc_dataset(updated_merged_df)
     return updated_merged_df
