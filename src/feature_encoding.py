@@ -1,10 +1,9 @@
 import re
-import heapq
 import nltk
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from sklearn.model_selection import train_test_split
+from nltk.stem import WordNetLemmatizer 
 
 def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, **kwargs):
     print()
@@ -58,17 +57,12 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
             return 'UP'
     
     merged_data['target'] = merged_data['targe_price_change'].apply(up_down_stay)
-    
-    #Train, Val, Test Split for Encoding
-
-    X_train, X_test = train_test_split(merged_data, test_size = 1 - train_split, random_state = 42)
-    X_val, X_test = train_test_split(X_test, test_size = test_split / (1 - train_split), random_state = 42)
 
     #Unigram Encoding
     
     def uni_encoding(data, category):
         word_count = {}
-        stopwords = nltk.corpus.stopwords.words('english')
+        lemmatizer = WordNetLemmatizer() 
         temp = data.loc[data['target'] == category]
         for form in tqdm(temp['full_text']):
             cleaned_form = re.sub(r'\W',' ', form)
@@ -77,47 +71,57 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
             cleaned_form = cleaned_form.lower()
             tokens = nltk.word_tokenize(cleaned_form)
             for token in tokens:
-                if token in stopwords:
-                    continue
-                if token not in word_count.keys():                 
-                    word_count[token] = 1
+                word = lemmatizer.lemmatize(token)
+                if word not in word_count.keys():                 
+                    word_count[word] = 1
                 else: 
-                    word_count[token] += 1
+                    word_count[word] += 1
         return word_count
     
-    print()
     print('  => Tokenizing Data for 3 Classes...')
     print()
     
-    up_dict = uni_encoding(X_train, 'UP')
-    down_dict = uni_encoding(X_train, 'DOWN')
-    stay_dict = uni_encoding(X_train, 'STAY')
+    up_dict = uni_encoding(merged_data.loc[merged_data['dataset'] == 'train'], 'UP')
+    up_dict = {key:val for key, val in up_dict.items() if val > 10}
+
+    down_dict = uni_encoding(merged_data.loc[merged_data['dataset'] == 'train'], 'DOWN')
+    down_dict = {key:val for key, val in down_dict.items() if val > 10}
+
+    stay_dict = uni_encoding(merged_data.loc[merged_data['dataset'] == 'train'], 'STAY')
+    stay_dict = {key:val for key, val in stay_dict.items() if val > 10}
     
     all_word_count = {**up_dict, **stay_dict, **down_dict}
-    all_word_count = {key:val for key, val in all_word_count.items() if val > 10}
                 
     #Compute PMI for each Class
     
     print()
-    print('  => Computing PMI...')
+    print('  => Computing PMI for 3 Classes...')
     print()
+    
+    def pmi_calc(all_words_dict, category_dict):
+        total_freq = sum(all_words_dict.values())
+        class_freq = sum(category_dict.values())
+        pmi_dict = {}
+        for token in tqdm(category_dict.keys()):
+            p_x = all_words_dict[token] / total_freq
+            p_x_class = category_dict[token] / class_freq
+            pmi_dict[token] = np.log(p_x_class / p_x)
+        return pmi_dict
                 
-    total_freq = sum(all_word_count.values())
-    pmi_dict = {}
-    for token in tqdm(all_word_count.keys()):
-        p_x = all_word_count[token] / total_freq
-        max_cond = []
-        for i in [up_dict, down_dict, stay_dict]:
-            if token in i.keys():
-                temp_sum = sum(i.values())
-                max_cond.append(i[token] / temp_sum)
-            else:
-                max_cond.append(0)
-        pmi_dict[token] = np.log(np.mean(max_cond) / p_x)
+    up_pmi = pmi_calc(all_word_count, up_dict)
+    up_pmi = {key: up_pmi[key] for key in sorted(up_pmi, key = up_pmi.get, reverse = True)[:773]}
+
+    down_pmi = pmi_calc(all_word_count, down_dict)
+    down_pmi = {key: down_pmi[key] for key in sorted(down_pmi, key = down_pmi.get, reverse = True)[:773]}
+
+    stay_pmi = pmi_calc(all_word_count, stay_dict)
+    stay_pmi = {key: stay_pmi[key] for key in sorted(stay_pmi, key = stay_pmi.get, reverse = True)[:773]}
         
     #Takes n Best Unigrams
     
-    highest_pmi = heapq.nlargest(n_unigrams, pmi_dict, key = pmi_dict.get)
+    highest_pmi = highest_pmi = {**up_pmi, **down_pmi, **stay_pmi}
+    unigram_features = pd.DataFrame(data = highest_pmi.keys(), columns = ['unigrams'])
+    unigram_features.to_csv('./data/model_unigrams.csv', index = False)
 
     print()
     print('  => Encoding Unigrams...')
