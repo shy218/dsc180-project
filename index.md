@@ -39,4 +39,14 @@ Stock market is one of the most popular markets that the investors like to put t
 
 * all the targets are the same as those in `Data Prep`, except `testing = true`
 
-![Sicherung vorbereiten](/ROC.png)
+## EDA
+
+![events](/events.png)
+
+Figure lists some of the most common event types (reason for filing an 8-K) within the training set. Since different events can drastically change the contents of an 8-K form, we thought it as a significant feature in identifying variance among groups.
+
+![label_breakdown](/label_breakdown.png)
+
+Figure shows that our data consists of around 38\% “down”, 22\% “stay”, and 40\% “up” labels. This breakdown is also roughly consistent within each split: train, validation, and test. This will allow for our training data to match the rest of the splits as best as possible. Though the “stay” labels only make up a small minority of the data, it is more important to better predict “down” and “up” due to its larger price swings.
+
+
