@@ -63,7 +63,7 @@ def feature_encoding():
         data_file = data_file.replace('./data', './test')
         phrase_file = phrase_file.replace('./data', './test')
 
-    merged_data = text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, out_dir = out_dir)
+    merged_data = text_encode(data_file, phrase_file, n_unigrams, threshhold, out_dir = out_dir)
     print(' => Exporting to pkl...')
     merged_data.to_pickle(out_dir + 'feature_encoded_merged_data.pkl')
 
