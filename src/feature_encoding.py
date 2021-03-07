@@ -5,7 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 from nltk.stem import WordNetLemmatizer 
 
-def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, test_split, **kwargs):
+def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
     print()
     print('===================================================================')
     print(' => Text encoding...')
@@ -80,7 +80,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
     
     print('  => Tokenizing Data for 3 Classes...')
     print()
-    
+        
     up_dict = uni_encoding(merged_data.loc[merged_data['dataset'] == 'train'], 'UP')
     up_dict = {key:val for key, val in up_dict.items() if val > 10}
 
@@ -107,18 +107,20 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, train_split, tes
             p_x_class = category_dict[token] / class_freq
             pmi_dict[token] = np.log(p_x_class / p_x)
         return pmi_dict
-                
-    up_pmi = pmi_calc(all_word_count, up_dict)
-    up_pmi = {key: up_pmi[key] for key in sorted(up_pmi, key = up_pmi.get, reverse = True)[:773]}
 
-    down_pmi = pmi_calc(all_word_count, down_dict)
-    down_pmi = {key: down_pmi[key] for key in sorted(down_pmi, key = down_pmi.get, reverse = True)[:773]}
-
-    stay_pmi = pmi_calc(all_word_count, stay_dict)
-    stay_pmi = {key: stay_pmi[key] for key in sorted(stay_pmi, key = stay_pmi.get, reverse = True)[:773]}
-        
     #Takes n Best Unigrams
     
+    top_n = n_unigrams // 3
+    
+    up_pmi = pmi_calc(all_word_count, up_dict)
+    up_pmi = {key: up_pmi[key] for key in sorted(up_pmi, key = up_pmi.get, reverse = True)[:top_n]}
+
+    down_pmi = pmi_calc(all_word_count, down_dict)
+    down_pmi = {key: down_pmi[key] for key in sorted(down_pmi, key = down_pmi.get, reverse = True)[:top_n]}
+
+    stay_pmi = pmi_calc(all_word_count, stay_dict)
+    stay_pmi = {key: stay_pmi[key] for key in sorted(stay_pmi, key = stay_pmi.get, reverse = True)[:top_n]}
+            
     highest_pmi = highest_pmi = {**up_pmi, **down_pmi, **stay_pmi}
     unigram_features = pd.DataFrame(data = highest_pmi.keys(), columns = ['unigrams'])
     unigram_features.to_csv('./data/model_unigrams.csv', index = False)

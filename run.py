@@ -54,8 +54,6 @@ def feature_encoding():
     phrase_file = feature_encoding_config['phrase_file']
     n_unigrams = feature_encoding_config['n_unigrams']
     threshhold = feature_encoding_config['threshhold']
-    train_split = feature_encoding_config['train_split']
-    test_split = feature_encoding_config['test_split']
 
     out_dir = 'data/processed/'
 
