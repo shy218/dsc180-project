@@ -1,0 +1,14 @@
+{
+    "data_dir": "./data/",
+    "notebook_dir": "./notebooks/",
+    "notebook_file": "eda.ipynb",
+    "report_dir": "reports/",
+    "report_file": "eda.html",
+    "everthing_below": "are_useless",
+    "data_path": "../data/out/AutoPhrase_Result/segmentation.txt",
+    "outerdir": "data/report",
+    "outdir": "data/report/report_files",
+    "report_in_path": "notebooks/report_notebook.ipynb",
+    "report_out_path": "data/report/report_notebook.html",
+    "manually_inspected_path": "data/tmp/sample_scores.csv"
+}
