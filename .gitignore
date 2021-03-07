@@ -1,9 +1,11 @@
 data/*
 
+notebooks/archived/*
+
 .DS_Store
 */.DS_Store
 
-*/.ipynb_checkpoints
+.ipynb_checkpoints
 .ftpconfig
 
 */__pycache__
