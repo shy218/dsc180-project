@@ -45,14 +45,14 @@ def train(train_config):
             train_unigrams = np.array(train['unigram_vec'].values.tolist())
             train_X = np.concatenate((train_events, num_train, train_unigrams), axis = 1)
 
-            model = RandomForestClassifier(max_depth = 10, n_estimators = 2000, max_features = 1250)
+            model = RandomForestClassifier(max_depth = 10, n_estimators = 2000, max_features = kwargs['max_features'])
             model = model.fit(train_X, train_y)
 
         if kwargs['train_type'] == 'phrase':
             train_phrases = np.array(train['top_phrases'].values.tolist())
             train_X = np.concatenate((train_events, num_train, train_phrases), axis = 1)
 
-            model = RandomForestClassifier(max_depth = 10, n_estimators = 2000, max_features = 1250)
+            model = RandomForestClassifier(max_depth = 10, n_estimators = 2000, max_features = kwargs['max_features'])
             model = model.fit(train_X, train_y)
 
         if kwargs['train_type'] == 'base':
@@ -63,22 +63,27 @@ def train(train_config):
 
         return model
 
+
+    if train_config['testing']:
+        max_features = 50
+    else:
+        max_features = 1250
     print('  => Training baseline model...')
     print()
 
-    base_model = create_model(data, train, train_type = 'base')
+    base_model = create_model(data, train, train_type = 'base', max_features = max_features)
 
     print()
     print('  => Training unigram model...')
     print()
 
-    uni_model = create_model(data, train, train_type = 'unigram')
+    uni_model = create_model(data, train, train_type = 'unigram', max_features = max_features)
 
     print()
     print('  => Training phrase model...')
     print()
 
-    phrase_model = create_model(data, train, train_type = 'phrase')
+    phrase_model = create_model(data, train, train_type = 'phrase', max_features = max_features)
 
     # Saving models
     print()
