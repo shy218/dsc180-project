@@ -83,10 +83,10 @@ def train(data_dir, out_dir):
     print('  => Exporting models to pkl...')
     print()
     
-    with open(out_dir, 'wb') as f:
+    with open(out_dir + 'base_model', 'wb') as f:
         pickle.dump(base_model, f)
-    with open(out_dir, 'wb') as f:
+    with open(out_dir + 'uni_model', 'wb') as f:
         pickle.dump(uni_model, f)
-    with open(out_dir, 'wb') as f:
+    with open(out_dir + 'phrase_model', 'wb') as f:
         pickle.dump(phrase_model, f)
     
