@@ -157,6 +157,8 @@ def merge_EPS_8K(data_dir, from_local_file = False):
 # Part 4
 def calc_price_changes(price_df, date_delta, most_recent_dates):
     price_delta = []
+    # print(price_df.date_idx, most_recent_dates)
+    # print(price_df.head())
     for date_idx in most_recent_dates:
         if date_idx == -1:
             price_delta.append(np.nan)
@@ -171,10 +173,13 @@ def calc_price_changes(price_df, date_delta, most_recent_dates):
             continue
 
         # Find prev info
-        prev_close = price_df.query('date_idx == "' + str(prev_date) + '"')['Adj Close'].values[0]
-        curr_close = price_df.query('date_idx == "' + str(date_idx) + '"')['Adj Close'].values[0]
+        # print(price_df.query('date_idx == ' + str(prev_date)))
+        prev_close = price_df.query('date_idx == ' + str(prev_date))['Adj Close'].values[0]
+        curr_close = price_df.query('date_idx == ' + str(date_idx))['Adj Close'].values[0]
         percent_change = round((curr_close - prev_close) / prev_close * 100, 2)
         price_delta.append(percent_change)
+    # print(price_delta)
+    # print(sum([np.isnan(i) for i in price_delta]))
     return price_delta
 
 def calc_prediction_target_vix(price_df, dates_pairs, sp500_dict, vix_dict):
@@ -188,8 +193,8 @@ def calc_prediction_target_vix(price_df, dates_pairs, sp500_dict, vix_dict):
             continue
 
         # Find stock price change info
-        curr_close = price_df.query('date_idx == "' + str(curr_date) + '"')['Adj Close'].values[0]
-        target_close = price_df.query('date_idx == "' + str(target_date) + '"')['Adj Close'].values[0]
+        curr_close = price_df.query('date_idx == ' + str(curr_date))['Adj Close'].values[0]
+        target_close = price_df.query('date_idx == ' + str(target_date))['Adj Close'].values[0]
         stock_percent_change = round((target_close - curr_close) / curr_close * 100, 2)
 
         # Fine sp500 price change info

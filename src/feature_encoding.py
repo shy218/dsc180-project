@@ -3,14 +3,14 @@ import nltk
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from nltk.stem import WordNetLemmatizer 
+from nltk.stem import WordNetLemmatizer
 
 def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
     print()
     print('===================================================================')
     print(' => Text encoding...')
     print()
-    
+
     merged_data = pd.read_csv(data_file)
 
     #Cleaned Event Feature
@@ -35,7 +35,7 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
 
     cleaned_event = merged_data['event_type'].apply(event_clean)
     merged_data.insert(3, 'cleaned_event', cleaned_event)
-    
+
     def event_clean_2(text):
         result = []
         for event in text:
@@ -45,9 +45,9 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
         return result
 
     merged_data['cleaned_event'] = merged_data['cleaned_event'].apply(event_clean_2)
-    
+
     #Creating Target Variable
-    
+
     def up_down_stay(price):
         if abs(price) < 1:
             return 'STAY'
@@ -55,14 +55,14 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
             return 'DOWN'
         else:
             return 'UP'
-    
+
     merged_data['target'] = merged_data['targe_price_change'].apply(up_down_stay)
 
     #Unigram Encoding
-    
+
     def uni_encoding(data, category):
         word_count = {}
-        lemmatizer = WordNetLemmatizer() 
+        lemmatizer = WordNetLemmatizer()
         temp = data.loc[data['target'] == category]
         for form in tqdm(temp['full_text']):
             cleaned_form = re.sub(r'\W',' ', form)
@@ -72,15 +72,15 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
             tokens = nltk.word_tokenize(cleaned_form)
             for token in tokens:
                 word = lemmatizer.lemmatize(token)
-                if word not in word_count.keys():                 
+                if word not in word_count.keys():
                     word_count[word] = 1
-                else: 
+                else:
                     word_count[word] += 1
         return word_count
-    
+
     print('  => Tokenizing Data for 3 Classes...')
     print()
-        
+
     up_dict = uni_encoding(merged_data.loc[merged_data['dataset'] == 'train'], 'UP')
     up_dict = {key:val for key, val in up_dict.items() if val > 10}
 
@@ -89,15 +89,15 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
 
     stay_dict = uni_encoding(merged_data.loc[merged_data['dataset'] == 'train'], 'STAY')
     stay_dict = {key:val for key, val in stay_dict.items() if val > 10}
-    
+
     all_word_count = {**up_dict, **stay_dict, **down_dict}
-                
+
     #Compute PMI for each Class
-    
+
     print()
     print('  => Computing PMI for 3 Classes...')
     print()
-    
+
     def pmi_calc(all_words_dict, category_dict):
         total_freq = sum(all_words_dict.values())
         class_freq = sum(category_dict.values())
@@ -109,9 +109,9 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
         return pmi_dict
 
     #Takes n Best Unigrams
-    
+
     top_n = n_unigrams // 3
-    
+
     up_pmi = pmi_calc(all_word_count, up_dict)
     up_pmi = {key: up_pmi[key] for key in sorted(up_pmi, key = up_pmi.get, reverse = True)[:top_n]}
 
@@ -120,10 +120,10 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
 
     stay_pmi = pmi_calc(all_word_count, stay_dict)
     stay_pmi = {key: stay_pmi[key] for key in sorted(stay_pmi, key = stay_pmi.get, reverse = True)[:top_n]}
-            
+
     highest_pmi = highest_pmi = {**up_pmi, **down_pmi, **stay_pmi}
     unigram_features = pd.DataFrame(data = highest_pmi.keys(), columns = ['unigrams'])
-    unigram_features.to_csv('./data/model_unigrams.csv', index = False)
+    # unigram_features.to_csv('./data/model_unigrams.csv', index = False)
 
     print()
     print('  => Encoding Unigrams...')
@@ -138,16 +138,16 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
         tokens = nltk.word_tokenize(cleaned_form)
         temp = []
         for token in highest_pmi:
-            if token in cleaned_form:                 
+            if token in cleaned_form:
                 temp.append(1)
-            else: 
+            else:
                 temp.append(0)
         form_vectors.append(temp)
 
     merged_data['unigram_vec'] = form_vectors
 
     #Quality Phrase Encoding
-    
+
     print()
     print('  => Encoding Quality Phrases...')
     print()
@@ -173,9 +173,9 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
         phrase_vectors.append(temp)
 
     merged_data['phrase_vec'] = phrase_vectors
-    
+
     print()
     print(' => Done feature_encoding!')
     print()
-    
-    return merged_data
+
+    return merged_data, unigram_features
