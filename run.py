@@ -8,10 +8,14 @@ sys.path.insert(1, './src/')
 from data_preprocessing import *
 from data_downloads import *
 from feature_encoding import *
+from report import *
+from train import *
 
 data_prep_config = json.load(open('config/data_prep.json', 'r'))
 feature_encoding_config = json.load(open('config/feature_encoding.json', 'r'))
 test_config = json.load(open('config/test.json', 'r'))
+report_config = json.load(open('config/report.json', 'r'))
+
 testing = False
 
 def data_prep(data_prep_config):
@@ -48,7 +52,7 @@ def data_prep(data_prep_config):
     print(' => Done Data Prep!')
     print()
 
-def feature_encoding():
+def feature_encoding(feature_encoding_config):
 
     data_file = feature_encoding_config['data_file']
     phrase_file = feature_encoding_config['phrase_file']
@@ -71,8 +75,8 @@ def handle_train(train_config):
     # train('./data/')
     pass
 
-def handle_evaluate():
-    pass
+def handle_report(report_config):
+    generate_report()
 
 
 def main():
@@ -85,11 +89,11 @@ def main():
     if target == 'data_prep':
         data_prep(data_prep_config)
     elif target == 'feature_encoding':
-        feature_encoding()
+        feature_encoding(feature_encoding_config)
     elif target == 'train':
-        handle_train()
-    elif target == 'evaluate':
-        handle_evaluate()
+        handle_train(train_config)
+    elif target == 'report':
+        handle_report(report_config)
     elif target == 'test':
         global testing
         testing = True
