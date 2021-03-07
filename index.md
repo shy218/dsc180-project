@@ -65,6 +65,26 @@ We also conducted some sentiment analysis on the sentences in the 8-K reports. W
 
 ## Result Analysis
 
+### Model Performance
 
+![class_accuracy](/class_accuracy.png)
+
+The figure show’s each model’s accuracy broken down by labels. All of the models were able to predict “up” and “down” better than chance which has the potential to provide great benefits in the financial world. Though all three models perform relatively the same for the “up” and “down” label, the unigram and the phrase models are able to predict the “stay” label with much higher accuracy. For our test set, the phrase model had the highest accuracy among all the 3 labels but only by a very small margin.
+
+![ROC](/ROC.png)
+
+Through using micro-averages and the OneVsRestClassifier, ROC chart shows the estimated ROC curve for all three models. All three models are able to perform relatively the same in terms of sensitivity and specificity.
+
+![uni](/uni_model_importance.png)
+![phrase](/phrase_model_importance.png)
+
+As shown by Figure for model importance, the model’s most important features were dominated by the main numerical features: price changes and earnings surprise (the most dominant feature). The high predicting power of these features helps to explain the baseline’s similar performance to the other enhanced models. Nevertheless, it is interesting to note some of the phrases and unigrams that contributed to the model’s predictability such as “weak” or “revenue growth”. Since many of these words/phrases make sense in a financial context, it helps to explain how some were able to have a small impact on the model, while words or phrases such as “gentleman” or “fee letters” have no impact on the model.
+
+\subsection{Simulation}
+We do a simulation to invest the stock market with our AutoPhrase model. We first train the models using data from 2002-2009. In each month of 2010-2012, we buy the stock with "UP" prediction result and short the stock with "DOWN" prediction, and calculate the average rate of return, assuming there is no commission fee. Note that this is the best way to simulation because the date and event of the 8-K reports are unpredictable. It is hard to buy all the stocks predicted to "UP", because we don't know the exact number of these stocks, and we are hard to assign the money to each of the stocks. In addition, the money needed for "short" is not same as "buy". Therefore, our simulation is not the best simulation based on the reality. 
+
+![simulation](/simulation.png)
+
+Figure 10 is the rate of return curve. (All the rate of reutrn is normalized by S&P 500 Index.) In this chart, the three models perform very similar. The rate of return for AutoPhrase model is highest, which is 201.8%, and the EPS Baseline is the lowest, which is 197.1\%. The return for Unigram model is in the middle, which is 201.2%. 
 
 
