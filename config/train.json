@@ -1,0 +1,5 @@
+{
+    "data_dir": "./data/",
+    "input_file": "processed/",
+    "testing": false
+}

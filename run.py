@@ -28,6 +28,8 @@ def data_prep(data_prep_config):
             download_price_history(raw_dir)
         if 'price_history' not in listdir(raw_dir):
             download_eps(raw_dir)
+        if 'sp500.csv' not in listdir(raw_dir):
+            os.system('cp ./test/raw/sp500.csv ' + raw_dir)
         print(' => All raw data ready!')
 
     # Process 8K, EPS and Price History as needed
@@ -67,6 +69,14 @@ def feature_encoding():
     print(' => Exporting to pkl...')
     merged_data.to_pickle(out_dir + 'feature_encoded_merged_data.pkl')
 
+def handle_train(train_config):
+    # train('./data/')
+    pass
+
+def handle_evaluate():
+    pass
+
+
 def main():
     if len(sys.argv) == 1:
         target = 'all'
@@ -78,6 +88,10 @@ def main():
         data_prep(data_prep_config)
     elif target == 'feature_encoding':
         feature_encoding()
+    elif target == 'train':
+        handle_train()
+    elif target == 'evaluate':
+        handle_evaluate()
     elif target == 'test':
         global testing
         testing = True
