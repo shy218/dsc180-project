@@ -39,6 +39,16 @@ Stock market is one of the most popular markets that the investors like to put t
 
 * all the targets are the same as those in `Data Prep`, except `testing = true`
 
+## Methodology
+
+In this project, we will train a machine learning model based on the phrase vectors from the AutoPhrase model and compare with two baseline models. We are doing a classification task, instead of a regression task on the stock price. We label the price data as three price trend classes -- "Up", "Stay" and "Down", based on the certain intervals of price change percentage. The first baseline model is the EPS model, which only uses the "Surpriseness" of the Earning per share to predict the price trend. The definition of "Surpriseness" will be described in the following section. The second baseline model is the linear model based on unigram given by Heeyoung Lee. He got around 50% accuracy on the testset, based only on unigram feature vectors. For this project, we will train our own models based on the AutoPhrase high-quality phrases and compare with the baseline models. We will also tune the hyper-parameters and compare different machine learning models, such as Random Forest, Logistic regression, SVM. 
+
+### "Surpriseness" of EPS
+We have the data for two kinds of EPS, the reported EPS and the concensus EPS, which is the estimated EPS provided by the stock researchers. The percentage difference between these two types of EPS is called the Surprise. If the reported EPS is higher than the concensus EPS, there is a positive Surprise, and we expect that the stock price will go up. If the reported EPS is lower than the concensus EPS, we expect the stock price will go down.
+
+### AutoPhrase
+First, we apply the AutoPhrase model to our 8-K reports with the knowledge base quality terms from the Wikipedia provided by Professor Shang. We do some data analysis and visualization, but the outcome is not what we expect. There are many high-quality terms provided by AutoPhrase model, that are meaningless to a financial report. Based on the advice from Professor Shang, we find our own financial knowledge base. We do the web mining to the Investopedia website, which is a website to help people to study finance. We get about 7000 from the Investopedia and replace the wiki terms to the financial terms. 
+
 ## EDA
 
 ![events](/events.png)
@@ -47,6 +57,14 @@ Figure lists some of the most common event types (reason for filing an 8-K) with
 
 ![label_breakdown](/label_breakdown.png)
 
-Figure shows that our data consists of around 38\% “down”, 22\% “stay”, and 40\% “up” labels. This breakdown is also roughly consistent within each split: train, validation, and test. This will allow for our training data to match the rest of the splits as best as possible. Though the “stay” labels only make up a small minority of the data, it is more important to better predict “down” and “up” due to its larger price swings.
+Figure shows that our data consists of around 38% “down”, 22% “stay”, and 40% “up” labels. This breakdown is also roughly consistent within each split: train, validation, and test. This will allow for our training data to match the rest of the splits as best as possible. Though the “stay” labels only make up a small minority of the data, it is more important to better predict “down” and “up” due to its larger price swings.
+
+![median_subjectivity](/median_subjectivity.png)
+
+We also conducted some sentiment analysis on the sentences in the 8-K reports. We found out that the distribution of median subjectivity is different when comparing outperforming and underperforming securities.
+
+## Result Analysis
+
+
 
 
