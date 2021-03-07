@@ -1,6 +1,6 @@
+import pickle
 import pandas as pd
 import numpy as np
-import pickle
 
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.ensemble import RandomForestClassifier
@@ -21,11 +21,8 @@ def train(data_dir, out_dir):
     data['top_phrases'] = data['phrase_vec'].apply(select_phrases)
     
     train = data.loc[data['dataset'] == 'train'].copy()
-    val = data.loc[data['dataset'] == 'val'].copy()
-    test = data.loc[data['dataset'] == 'test'].copy()
     
-    
-    def create_model(all_data, train, test, **kwargs):
+    def create_model(all_data, train, **kwargs):
 
         num_train = train[['Surprise(%)', 'price_change_7', 
                   'price_change_30', 'price_change_90', 'price_change_365',
@@ -59,7 +56,6 @@ def train(data_dir, out_dir):
             
         if kwargs['train_type'] == 'base':
             train_X = np.concatenate((train_events, num_train), axis = 1)
-            test_X = np.concatenate((test_events, num_test), axis = 1)
 
             model = RandomForestClassifier(max_depth = 10, n_estimators = 2000)
             model = model.fit(train_X, train_y)
@@ -69,19 +65,19 @@ def train(data_dir, out_dir):
     print('  => Training baseline model...')
     print()
     
-    base_model = create_model(data, train, test, train_type = 'base')
+    base_model = create_model(data, train, train_type = 'base')
     
     print()
     print('  => Training unigram model...')
     print()
     
-    uni_model = create_model(data, train, test, train_type = 'unigram')
+    uni_model = create_model(data, train, train_type = 'unigram')
     
     print()
     print('  => Training phrase model...')
     print()
     
-    phrase_model = create_model(data, train, test, train_type = 'phrase')
+    phrase_model = create_model(data, train, train_type = 'phrase')
     
     print()
     print('  => Exporting models to pkl...')
