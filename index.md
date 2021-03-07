@@ -80,7 +80,7 @@ Through using micro-averages and the OneVsRestClassifier, ROC chart shows the es
 
 As shown by Figure for model importance, the model’s most important features were dominated by the main numerical features: price changes and earnings surprise (the most dominant feature). The high predicting power of these features helps to explain the baseline’s similar performance to the other enhanced models. Nevertheless, it is interesting to note some of the phrases and unigrams that contributed to the model’s predictability such as “weak” or “revenue growth”. Since many of these words/phrases make sense in a financial context, it helps to explain how some were able to have a small impact on the model, while words or phrases such as “gentleman” or “fee letters” have no impact on the model.
 
-\subsection{Simulation}
+### Simulation
 We do a simulation to invest the stock market with our AutoPhrase model. We first train the models using data from 2002-2009. In each month of 2010-2012, we buy the stock with "UP" prediction result and short the stock with "DOWN" prediction, and calculate the average rate of return, assuming there is no commission fee. Note that this is the best way to simulation because the date and event of the 8-K reports are unpredictable. It is hard to buy all the stocks predicted to "UP", because we don't know the exact number of these stocks, and we are hard to assign the money to each of the stocks. In addition, the money needed for "short" is not same as "buy". Therefore, our simulation is not the best simulation based on the reality. 
 
 ![simulation](/simulation.png)
