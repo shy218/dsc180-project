@@ -15,13 +15,16 @@ def train(train_config):
     print()
 
     data = pd.read_pickle(train_config['data_dir'] + 'processed/feature_encoded_merged_data.pkl')
+    
+    n_phrases = len(data['unigram_vec'].values[0])
 
-    def select_phrases(phrases):
-        return phrases[:2107]
+    def select_phrases(phrases, n_phrases):
+        return phrases[:n_phrases]
 
     data['top_phrases'] = data['phrase_vec'].apply(select_phrases)
 
     train = data.loc[data['dataset'] == 'train'].copy()
+    test = data.loc[data['dataset'] == 'test'].copy()
 
     def create_model(all_data, train, **kwargs):
 
@@ -79,13 +82,53 @@ def train(train_config):
     print()
 
     phrase_model = create_model(data, train, train_type = 'phrase')
+    
+    print()
+    print('  => Exporting test results to pkl...')
+    print()
+    
+    num_train = train[['Surprise(%)', 'price_change_7', 
+               'price_change_30', 'price_change_90', 'price_change_365',
+               'prev_vix_values']].to_numpy()
 
+    test_scaler = StandardScaler()
+
+    num_test = test[['Surprise(%)', 'price_change_7', 
+                   'price_change_30', 'price_change_90', 'price_change_365',
+                   'prev_vix_values']].to_numpy()
+
+    test_scaler.fit(num_train)
+    num_test = phrase_scaler.transform(num_test)
+    
+    mlb = MultiLabelBinarizer()
+    all_events = pd.DataFrame(mlb.fit_transform(all_data['cleaned_event']),
+                                  columns = mlb.classes_,
+                                  index = all_data['cleaned_event'].index)
+    
+    test_events = all_events.iloc[all_data.loc[all_data['dataset'] == 'test'].index].to_numpy()
+    test_unigrams = np.array(test['unigram_vec'].values.tolist())
+    test_phrase = np.array(test['top_phrases'].values.tolist())
+    
+    base_test_X = np.concatenate((test_events, num_test_X), axis = 1)
+    unigram_test_X = np.concatenate((test_events, num_test_X, test_unigrams), axis = 1)
+    phrase_test_X = np.concatenate((test_events, num_test_X, test_phrase), axis = 1)
+    
+    test_y = test[['target']].to_numpy().ravel()
+    
+    test['base_pred'] = base_model.predict(base_test_X)
+    test['unigram_pred'] = uni_model_best.predict(unigram_test_X)
+    test['phrase_pred'] = phrase_model_best.predict(phrase_test_X)
+    
+    test.to_pickle('../data/tmp/model_results.pkl')
+    
     # Saving models
     print()
     print('  => Exporting models to pkl...')
     print()
+    
     out_dir = train_config["data_dir"] + train_config['output_file']
     os.system('mkdir -p ' + out_dir)
+
     with open(out_dir + 'base_model', 'wb') as f:
         pickle.dump(base_model, f)
     with open(out_dir + 'uni_model', 'wb') as f:
