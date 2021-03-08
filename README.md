@@ -25,4 +25,12 @@ Our 3 main targets are data preparation, feature encoding and a test target. The
 
 ## Test
 
-* all the targets are the same as those in `Data Prep`, except `testing = true`
+* test target will run the whole project with only test data
+
+
+## Correct order of excution
+* data_prep: `python run.py data_prep`
+* feature_encoding: `python run.py feature_encoding`
+* (optional) eda: `python run.py eda`
+* train: `python run.py train`
+* (optional) report: `python run.py report`

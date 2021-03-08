@@ -130,6 +130,7 @@ def main():
         final_report_config['data_dir'] = './test/'
         with open('./config/notebook.json', 'w') as outfile:
             json.dump(notebook_config, outfile)
+
         data_prep(data_prep_config)
         feature_encoding(feature_encoding_config)
         generate_report_from_notebook(eda_config)
