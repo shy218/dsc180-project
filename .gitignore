@@ -1,4 +1,7 @@
 data/*
+test/models/*
+test/tmp/*
+test/reports/*
 
 notebooks/archived/*
 

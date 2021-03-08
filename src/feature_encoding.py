@@ -174,6 +174,12 @@ def text_encode(data_file, phrase_file, n_unigrams, threshhold, **kwargs):
 
     merged_data['phrase_vec'] = phrase_vectors
 
+    # Copied from train.py
+    n_phrases = len(merged_data['unigram_vec'].values[0])
+    def select_phrases(phrases, n_phrases):
+        return phrases[:n_phrases]
+    merged_data['top_phrases'] = merged_data['phrase_vec'].apply(lambda x: select_phrases(x, n_phrases))
+
     print()
     print(' => Done feature_encoding!')
     print()

@@ -8,19 +8,35 @@ sys.path.insert(1, './src/')
 from data_preprocessing import *
 from data_downloads import *
 from feature_encoding import *
-from report import *
+from reports import *
 from train import *
 
 data_prep_config = json.load(open('config/data_prep.json', 'r'))
 feature_encoding_config = json.load(open('config/feature_encoding.json', 'r'))
-test_config = json.load(open('config/test.json', 'r'))
-report_config = json.load(open('config/report.json', 'r'))
+# test_config = json.load(open('config/test.json', 'r'))
+eda_config = json.load(open('config/eda.json', 'r'))
+train_config = json.load(open('config/train.json', 'r'))
+final_report_config = json.load(open('config/final_report.json', 'r'))
 
+# By default, not testing
 testing = False
 
+# By default, notebook should not be in testing mode
+notebook_config = {'testing': False}
+with open('./config/notebook.json', 'w') as outfile:
+    json.dump(notebook_config, outfile)
+
 def data_prep(data_prep_config):
+    # "raw_8k_fp": "8K-gz/",
+    # "raw_eps_fp": "EPS/",
+
+    global testing
+    if testing:
+        data_prep_config['testing'] = True
+        data_prep_config['data_dir'] = './test/'
+
     data_dir = data_prep_config['data_dir']
-    raw_dir = data_prep_config['raw_dir']
+    raw_dir = data_dir + data_prep_config['raw_dir']
 
     # Download RAW data if needed (and if not in testing mode)
     if not data_prep_config['testing']:
@@ -37,47 +53,55 @@ def data_prep(data_prep_config):
         print(' => All raw data ready!')
 
     # Process 8K, EPS and Price History as needed
-    processed_dir = data_prep_config['processed_dir']
-    if 'processed' not in listdir(data_dir):
-        os.system('mkdir ' + processed_dir)
+    processed_dir = data_dir + data_prep_config['processed_dir']
+    os.system('mkdir -p ' + processed_dir)
 
     # handler_clean_8k(data_prep_config['data_dir'])
-    global testing
+
     if not testing: # only process eps when it's not testing
         handler_process_eps(data_dir)
     # Run part 3, 4
     updated_merged_df = handle_merge_eps8k_pricehist(data_dir)
-    updated_merged_df.to_csv(data_dir + 'processed/merged_all_data.csv', index = False)
+    updated_merged_df.to_csv(processed_dir + 'merged_all_data.csv', index = False)
     print()
     print(' => Done Data Prep!')
     print()
 
 def feature_encoding(feature_encoding_config):
+    global testing
+    if testing:
+        feature_encoding_config['data_dir'] = './test/'
 
-    data_file = feature_encoding_config['data_file']
-    phrase_file = feature_encoding_config['phrase_file']
+    data_dir = feature_encoding_config['data_dir']
+    data_file = data_dir + feature_encoding_config['data_file']
+    phrase_file = data_dir + feature_encoding_config['phrase_file']
+    out_dir = data_dir + feature_encoding_config['out_dir']
     n_unigrams = feature_encoding_config['n_unigrams']
     threshhold = feature_encoding_config['threshhold']
 
-    out_dir = 'data/processed/'
-
-    global testing
-    if testing:
-        out_dir = 'test/processed/'
-        data_file = data_file.replace('./data', './test')
-        phrase_file = phrase_file.replace('./data', './test')
-
-    merged_data = text_encode(data_file, phrase_file, n_unigrams, threshhold, out_dir = out_dir)
-    print(' => Exporting to pkl...')
+    merged_data, unigram_features = text_encode(data_file, phrase_file, n_unigrams, threshhold, out_dir = out_dir)
+    print(' => Exporting...')
     merged_data.to_pickle(out_dir + 'feature_encoded_merged_data.pkl')
+    unigram_features.to_csv(out_dir + 'model_unigrams.csv', index = False)
 
 def handle_train(train_config):
-    # train('./data/')
-    pass
+    global testing
+    if testing == True:
+        train_config['data_dir'] = './test/'
+        train_config['testing'] = True
+    train(train_config)
 
-def handle_report(report_config):
-    generate_report()
-
+# def handle_final_report(report_config):
+#     # global testing
+#     # if testing == True:
+#     #     report_config['data_dir'] = './test/'
+#     generate_report_from_notebook(report_config)
+#
+# def handle_eda(eda_config):
+#     # global testing
+#     # if testing == True:
+#     #     eda_config['data_dir'] = './test/'
+#     generate_report_from_notebook(eda_config)
 
 def main():
     if len(sys.argv) == 1:
@@ -90,14 +114,24 @@ def main():
         data_prep(data_prep_config)
     elif target == 'feature_encoding':
         feature_encoding(feature_encoding_config)
+    elif target == 'eda':
+        generate_report_from_notebook(eda_config)
     elif target == 'train':
         handle_train(train_config)
     elif target == 'report':
-        handle_report(report_config)
+        generate_report_from_notebook(final_report_config)
     elif target == 'test':
         global testing
         testing = True
-        data_prep(test_config)
-        feature_encoding()
+        notebook_config['testing'] = True
+        eda_config['data_dir'] = './test/'
+        final_report_config['data_dir'] = './test/'
+        with open('./config/notebook.json', 'w') as outfile:
+            json.dump(notebook_config, outfile)
+        data_prep(data_prep_config)
+        feature_encoding(feature_encoding_config)
+        generate_report_from_notebook(eda_config)
+        handle_train(train_config)
+        generate_report_from_notebook(final_report_config)
 
 main()
