@@ -61,7 +61,7 @@ Test target will run the whole project with only test data
 * (optional) report: `python run.py report`
 
 
-### Project Links
+## Project Links
 
 * [Project Website](https://shy218.github.io/dsc180-project/)
 * [AutoPhrase](https://github.com/shangjingbo1226/AutoPhrase)
