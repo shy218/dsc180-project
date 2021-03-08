@@ -11,6 +11,8 @@ from feature_encoding import *
 from reports import *
 from train import *
 
+os.system('mkdir -p data')
+
 data_prep_config = json.load(open('config/data_prep.json', 'r'))
 feature_encoding_config = json.load(open('config/feature_encoding.json', 'r'))
 # test_config = json.load(open('config/test.json', 'r'))
@@ -45,9 +47,9 @@ def data_prep(data_prep_config):
         if '8K-gz' not in listdir(raw_dir):
             download_8k(raw_dir)
         if 'EPS' not in listdir(raw_dir):
-            download_price_history(raw_dir)
-        if 'price_history' not in listdir(raw_dir):
             download_eps(raw_dir)
+        if 'price_history' not in listdir(raw_dir):
+            download_price_history(raw_dir)
         if 'sp500.csv' not in listdir(raw_dir):
             os.system('cp ./test/raw/sp500.csv ' + raw_dir)
         print(' => All raw data ready!')
