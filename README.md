@@ -28,7 +28,7 @@ The feature encoding target creates encoded text vectors for each 8-K: both unig
 ## Train
 
 Trains Random Forest models using 3 feature sets on encoded data: baseline, baseline + unigrams, and baseline + phrases. The selected classifier and set model parameters were decided through comparing validation accuracy.  
-<br />
+
 * `data_dir` is the file path with all data files from data prep targed: processed, raw, models, etc.
 * `input_file` is the file path (from `data_dir`) to outputed files by the feature encoding target
 * `output_file` is the desired file path to download trained, outputed models
@@ -64,4 +64,5 @@ Test target will run the whole project with only test data
 ### Project Links
 
 *[Project Website](https://shy218.github.io/dsc180-project/)
+<br />
 *[AutoPhrase](https://github.com/shangjingbo1226/AutoPhrase)
