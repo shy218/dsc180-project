@@ -63,6 +63,5 @@ Test target will run the whole project with only test data
 
 ### Project Links
 
-*[Project Website](https://shy218.github.io/dsc180-project/)
-<br />
-*[AutoPhrase](https://github.com/shangjingbo1226/AutoPhrase)
+* [Project Website](https://shy218.github.io/dsc180-project/)
+* [AutoPhrase](https://github.com/shangjingbo1226/AutoPhrase)
