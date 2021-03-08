@@ -1,4 +1,4 @@
-# DSC 180B Project
+# AutoPhrase for Financial Documents Interpretation 
 
 Our main targets are data preparation, feature encoding, eda (optional), train, report (optional), and test. Users can configure parameters for these targets in the ./config files.
 
@@ -59,3 +59,9 @@ Test target will run the whole project with only test data
 * (optional) eda: `python run.py eda`
 * train: `python run.py train`
 * (optional) report: `python run.py report`
+
+
+### Project Links
+
+*[Project Website](https://shy218.github.io/dsc180-project/)
+*[AutoPhrase](https://github.com/shangjingbo1226/AutoPhrase)
