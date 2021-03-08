@@ -4,6 +4,9 @@ import pandas as pd
 from tqdm import tqdm
 from os import listdir
 
+import nltk
+nltk.download('wordnet')
+
 sys.path.insert(1, './src/')
 from data_preprocessing import *
 from data_downloads import *
