@@ -5,8 +5,7 @@ from nbconvert import HTMLExporter
 
 def generate_report_from_notebook(config):
 
-    print(' => Generating EDA...')
-    os.system('mkdir -p ' + config['data_dir'] + config['report_dir'])
+    print(' => Generating', config['report_name'], '...')
 
     curdir = os.path.abspath(os.getcwd())
     # indir, _ = os.path.split(report_in_path)
@@ -21,7 +20,7 @@ def generate_report_from_notebook(config):
     # notebook file path
     nb_fp = config['notebook_dir'] + config['notebook_file']
     nb = nbformat.read(open(nb_fp), as_version=4)
-    html_exporter = HTMLExporter(config=html_config)
+    html_exporter = HTMLExporter(config=html_config, resources={'curr_dir': config['data_dir']})
 
     # change dir to notebook dir, to execute notebook
     os.chdir(config['notebook_dir'])
@@ -33,6 +32,7 @@ def generate_report_from_notebook(config):
     # change back to original directory
     os.chdir(curdir)
 
+    os.system('mkdir -p ' + config['data_dir'] + config['report_dir'])
     report_out_path = config['data_dir'] + config['report_dir'] + config['report_file']
     with open(report_out_path, 'w') as fh:
         fh.write(body)
